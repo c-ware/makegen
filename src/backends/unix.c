@@ -25,33 +25,92 @@
 */
 
 /*
- * Contains the logic for producing a UNIX-style Makefile.
+ * Contains the logic for producing Makefiles for UNIX.
 */
 
 #include "backends.h"
 
 #include "../makegen.h"
 
-void makefile_unix(struct ArgparseParser parser, struct FilesystemPaths files) {
+void dump_objs_variable(FILE *location, struct FilesystemPaths files) {
     int index = 0;
-    FILE *location = stdout;
+    char object_path[PATH_LENGTH + 1];
+
+    fprintf(location, "%s", "OBJS=");
 
     for(index = 0; index < carray_length(&files); index++) {
-        struct Inclusions *file_inclusions = NULL;
         struct FilesystemPath file = files.contents[index];
 
         /* Has to be a C file */
-        if(file.path[strlen(file.path) - 1] != 'c')
+        if(file.path[strlen(file.path) - 2] != '.' || file.path[strlen(file.path) - 1] != 'c')
             continue;
 
-        /* 'Change' this to an object file temporarily */
-        file.path[strlen(file.path) - 1] = 'o';
+        /* Make it a .o file */
+        strncpy(object_path, file.path, PATH_LENGTH);
+        object_path[strlen(object_path) - 1] = 'o';
 
-        fprintf(location, "%s:", file.path);
 
-        /* 'Change' this back to a C file */
-        file.path[strlen(file.path) - 1] = 'c';
+        fprintf(location, "%s", object_path);
 
-        fprintf(location, " %s\n", file.path);
+        if(index != carray_length(&files))
+            fprintf(location, "%s", " ");
     }
+
+    fprintf(location, "%c", '\n');
+}
+
+void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths files) {
+    int index = 0;
+    FILE *location = stdout;
+    struct Inclusions *file_inclusions = NULL;
+
+    file_inclusions = carray_init(file_inclusions, INCLUSION);
+
+    /* Dump some variables */
+    fprintf(location, "%s", "CC=cc\n");
+
+    dump_objs_variable(location, files);
+    fprintf(location, "%s", "\n\n");
+
+    /* Dump some rules */
+    fprintf(location, "%s", "all: $(OBJS)\n\n");
+
+    /* Dump targets for each file */
+    for(index = 0; index < carray_length(&files); index++) {
+        int file_index = 0;
+        char source_file[PATH_LENGTH + 1] = "";
+        char object_file[PATH_LENGTH + 1] = "";
+        struct FilesystemPath file = files.contents[index];
+
+        /* Has to be a C file */
+        if(file.path[strlen(file.path) - 2] != '.' || file.path[strlen(file.path) - 1] != 'c')
+            continue;
+
+        /* Create paths */
+        strncpy(source_file, file.path, PATH_LENGTH);
+        strncpy(object_file, file.path, PATH_LENGTH);
+        object_file[strlen(object_file) - 1] = 'o';
+
+        /* FILE.o: FILE.c ... */
+        fprintf(location, "%s: %s", object_file, source_file);
+
+        /* Yank the files inclusions this file has out */
+        makegen_extract_inclusions_buffer(file.path, file_inclusions);
+
+        /* Dump included files */
+        for(file_index = 0; file_index < carray_length(file_inclusions); file_index++) {
+            char resolved_inclusion[PATH_LENGTH + 1] = "";
+            char *header = file_inclusions->contents[file_index].path;
+
+            makegen_resolve_path(file.path, header, resolved_inclusion, PATH_LENGTH);
+            fprintf(location, " %s", resolved_inclusion);
+        }
+
+        fprintf(location, "%c", '\n');
+        fprintf(location, "\t$(CC) -c %s -o %s $(CFLAGS)\n", source_file, object_file);
+        fprintf(location, "%c", '\n');
+    }
+
+
+    carray_free(file_inclusions, INCLUSION);
 }

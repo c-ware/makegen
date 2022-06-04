@@ -41,6 +41,14 @@
 #define INCLUSION_PATH_LENGTH   256 + 1
 #define FILENAME_LENGTH         128 + 1
 
+/* Enumerations */
+#define MAKEGEN_UNKNOWN         -1
+
+#define MAKEGEN_TARGET_PROJECT 0
+#define MAKEGEN_TARGET_LIBRARY 1
+
+#define MAKEGEN_DIALECT_UNIX    0
+
 /* Data structure properties */
 #define INCLUSION_HEAP  1
 #define INCLUSION_TYPE  struct Inclusion
@@ -225,7 +233,46 @@ void makegen_extract_inclusions_buffer(const char *path, struct Inclusions *incl
 int makegen_resolve_path(const char *source_path, const char *header_path,
                          char *buffer, int length);
 
+/*
+ * @docgen: function
+ * @brief: enumerate a string that contains a makefile dialect
+ * @name: makegen_enumerate_dialect
+ *
+ * @description
+ * @Enumerate a string that contains a Makefile dialect and produce an integer
+ * @that represents that string.
+ * @description
+ *
+ * @error: string is NULL
+ * @error: string is not enumerable
+ *
+ * @param string: the string to enumerate
+ * @type: const char *
+ *
+ * @return: an integer representing the string
+ * @type: int
+*/
+int makegen_enumerate_dialect(const char *string);
 
-
+/*
+ * @docgen: function
+ * @brief: enumerate a string that contains a target name
+ * @name: makegen_enumerate_target
+ *
+ * @description
+ * @Enumerate a string that contains a target and produce an integer that
+ * @represents that string.
+ * @description
+ *
+ * @error: string is NULL
+ * @error: string is not enumerable
+ *
+ * @param string: the string to enumerate
+ * @type: const char *
+ *
+ * @return: an integer representing the string
+ * @type: int
+*/
+int makegen_enumerate_target(const char *string);
 
 #endif

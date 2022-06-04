@@ -38,7 +38,7 @@ struct FilesystemPaths;
 /*
  * @docgen: function
  * @brief: create a unix makefile
- * @name makefile_unix:
+ * @name: unix_project_makefile
  *
  * @description
  * @Create a new UNIX Makefile in the directory the program was launched in,
@@ -53,6 +53,6 @@ struct FilesystemPaths;
  * @param files: the files to use to make the Makefile
  * @type: struct FilesystemPaths *
 */
-void makefile_unix(struct ArgparseParser parser, struct FilesystemPaths files);
+void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths files);
 
 #endif

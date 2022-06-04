@@ -106,7 +106,8 @@ static struct FilesystemPaths *collect_source_files(void) {
 struct ArgparseParser setup_arguments(int argc, char **argv) {
     struct ArgparseParser parser = argparse_init("docgen", argc, argv);
 
-    argparse_add_argument(&parser, "type");
+    argparse_add_argument(&parser, "target");
+    argparse_add_argument(&parser, "dialect");
     argparse_add_option(&parser, "--help", "-h", 0);
 
     /* Display a help message */
@@ -117,7 +118,8 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
         printf("%s", "Generate different types of Makefiles\n");
         printf("%s", "\n");
         printf("%s", "Positional arguments:\n");
-        printf("%s", "\ttype\t\t\tthe type of Makefile to make\n");
+        printf("%s", "\ttarget\t\t\tthe type of Makefile to create\n");
+        printf("%s", "\tdialect\t\t\tthe dialect of Makefile to create\n");
         printf("%s", "\n");
         printf("%s", "Options:\n");
         printf("\t--help, -h\t\tdisplay this message\n");
@@ -127,17 +129,19 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
 
     argparse_error(parser);
 
+    /* Make sure an invalid target or dialect was not passed. */
+    makegen_enumerate_target(argparse_get_argument(parser, "target"));
+    makegen_enumerate_dialect(argparse_get_argument(parser, "dialect"));
+
     return parser;
 }
 
 int main(int argc, char **argv) {
-    int index = 0;
     struct FilesystemPaths *paths = NULL;
     struct ArgparseParser parser = setup_arguments(argc, argv);
 
     paths = collect_source_files();
-
-    makefile_unix(parser, *paths);
+    unix_project_makefile(parser, *paths);
 
     argparse_free(parser);
     carray_free(paths, PATH_ARRAY);

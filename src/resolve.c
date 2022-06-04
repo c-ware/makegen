@@ -54,8 +54,8 @@
  * remaining path.
 */
 
-#include "backends.h"
-#include "../makegen.h"
+#include "makegen.h"
+#include "backends/backends.h"
 
 int makegen_resolve_path(const char *source_path, const char *header_path,
                           char *buffer, int length) {
@@ -68,11 +68,10 @@ int makegen_resolve_path(const char *source_path, const char *header_path,
     strncpy(source_path_dirname, source_path, PATH_LENGTH);
     libpath_dirname(source_path_dirname);
 
-
     /* If the inclusion path does not start with `../` then that means
      * the inclusion is happening in this directory, rather than a parent. */
     if(strstarts(header_path, "../") == 0) {
-        written = libpath_join_path(buffer, length, source_path, "/", header_path, NULL);
+        written = libpath_join_path(buffer, length, source_path_dirname, "/", header_path, NULL);
 
         if(written >= length) {
             fprintf(stderr, "makegen_resolve_path: buffer is too small to fit resolved path (%s:%i)\n",
@@ -91,7 +90,7 @@ int makegen_resolve_path(const char *source_path, const char *header_path,
     strncpy(header_path_dirname, header_path + (3 * parent_references), PATH_LENGTH);
 
     /* Keep ripping dirnames off until there are no more parent references */
-    while(parent_references != -1) {
+    while(parent_references != 0) {
         libpath_dirname(source_path_dirname);
 
         parent_references--;
