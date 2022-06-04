@@ -134,15 +134,10 @@ int main(int argc, char **argv) {
     int index = 0;
     struct FilesystemPaths *paths = NULL;
     struct ArgparseParser parser = setup_arguments(argc, argv);
-    char buffer[256 + 1];
 
     paths = collect_source_files();
 
-    makegen_resolve_path("./src/main.c", "../backends/backends.h", buffer, 256);
-
-    /*
     makefile_unix(parser, *paths);
-    */
 
     argparse_free(parser);
     carray_free(paths, PATH_ARRAY);

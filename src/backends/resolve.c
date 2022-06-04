@@ -66,7 +66,6 @@ int makegen_resolve_path(const char *source_path, const char *header_path,
 
     /* Strip the name of the source file off of the path */
     strncpy(source_path_dirname, source_path, PATH_LENGTH);
-    strncpy(header_path_dirname, header_path, PATH_LENGTH);
     libpath_dirname(source_path_dirname);
 
 
@@ -84,8 +83,12 @@ int makegen_resolve_path(const char *source_path, const char *header_path,
         return written;
     }
 
-    /* Inclusions involves referencing a parent directory. */
+    /* Inclusions involves referencing a parent directory. We strip
+     * off the first 3n characters because the header path header
+     * path *should* be essentially be chained references. If we
+     * strip these off, we can tack this on the final path. */
     parent_references = strcount(header_path, "../");
+    strncpy(header_path_dirname, header_path + (3 * parent_references), PATH_LENGTH);
 
     /* Keep ripping dirnames off until there are no more parent references */
     while(parent_references != -1) {
@@ -94,5 +97,14 @@ int makegen_resolve_path(const char *source_path, const char *header_path,
         parent_references--;
     }
 
-    printf("Final path: %s\n", source_path_dirname);
+    /* Write the final path */
+    written = libpath_join_path(buffer, length, source_path_dirname, "/", header_path_dirname, NULL);
+
+    if(written >= length) {
+        fprintf(stderr, "makegen_resolve_path: buffer is too small to fit resolved path (%s:%i)\n",
+                __FILE__, __LINE__);
+        abort();
+    }
+
+    return written;
 }
