@@ -32,7 +32,8 @@
 #ifndef CWARE_MAKEGEN_BACKENDS_H
 #define CWARE_MAKEGEN_BACKENDS_H
 
-#include "../makegen.h"
+struct ArgparseParser;
+struct FilesystemPaths;
 
 /*
  * @docgen: function

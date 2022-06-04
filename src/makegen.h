@@ -34,6 +34,7 @@
 #include "libpath/libpath.h"
 #include "libmatch/libmatch.h"
 #include "argparse/argparse.h"
+#include "libstring/libstring.h"
 
 /* Limits */
 #define PATH_LENGTH             512 + 1

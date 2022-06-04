@@ -30,6 +30,8 @@
 
 #include "backends.h"
 
+#include "../makegen.h"
+
 void makefile_unix(struct ArgparseParser parser, struct FilesystemPaths files) {
     int index = 0;
     FILE *location = stdout;

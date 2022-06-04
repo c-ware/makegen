@@ -137,6 +137,9 @@ int main(int argc, char **argv) {
     char buffer[256 + 1];
 
     paths = collect_source_files();
+
+    makegen_resolve_path("./src/main.c", "../backends/backends.h", buffer, 256);
+
     /*
     makefile_unix(parser, *paths);
     */
