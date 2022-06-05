@@ -39,6 +39,7 @@
  * @embed function: argparse_get_argument
  * @embed function: argparse_get_option_parameter
  * @embed function: argparse_free
+ * @embed function: argparse_option_exists
  *
  * @embed macro_function: argparse_option_parameter_iter
  * @embed macro_function: argparse_argument_variable_iter
@@ -57,7 +58,10 @@
 #ifndef CWARE_ARGPARSE_H
 #define CWARE_ARGPARSE_H
 
+#define CWARE_ARGPARSE_VERSION  "1.0.0"
+
 /* Possibilities for variable option parameters */
+#define ARGPARSE_FLAG           0
 #define ARGPARSE_NOT_FOUND      -1
 #define ARGPARSE_VARIABLE       -2
 #define ARGPARSE_VARIABLE_ONE   -3

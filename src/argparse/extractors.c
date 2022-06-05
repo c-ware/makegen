@@ -39,7 +39,10 @@
 #include "argparse_internal.h"
 
 int argparse_option_exists(struct ArgparseParser parser, const char *option) {
-    return argparse_option_argv_index(parser, option);
+    if(argparse_option_argv_index(parser, option) == ARGPARSE_NOT_FOUND)
+        return 0;
+
+    return 1;
 }
 
 char *argparse_get_argument(struct ArgparseParser parser, const char *argument) {

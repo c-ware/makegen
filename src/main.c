@@ -29,6 +29,7 @@
 
 #include "makegen.h"
 #include "backends/backends.h"
+#include "argparse/argparse_internal.h"
 
 void push_literal(struct PathStack *directories, const char *literal) {
     struct FilesystemPath new_path;
@@ -106,15 +107,25 @@ static struct FilesystemPaths *collect_source_files(void) {
 struct ArgparseParser setup_arguments(int argc, char **argv) {
     struct ArgparseParser parser = argparse_init("docgen", argc, argv);
 
+    /* Add some arguments */
     argparse_add_argument(&parser, "target");
     argparse_add_argument(&parser, "dialect");
+
+    /* Add some options */
     argparse_add_option(&parser, "--help", "-h", 0);
+    argparse_add_option(&parser, "--src", "-s", 1);
+    argparse_add_option(&parser, "--tests", "-t", 1);
+    argparse_add_option(&parser, "--main", "-m", 1);
 
     /* Display a help message */
-    if(argparse_option_exists(parser, "--help") != ARGPARSE_NOT_FOUND ||
-       argparse_option_exists(parser, "-h") != ARGPARSE_NOT_FOUND) {
+    if(argparse_option_exists(parser, "--help") != 0 ||
+       argparse_option_exists(parser, "-h") != 0) {
 
-        printf("%s", "Usage: makegen TYPE [ --help | -h ]\n");
+        printf("%s", "Usage: makegen TARGET DIALECT [ --help | -h ]");
+        printf("%s", " [ --src SRC | -s SRC]\n");
+        printf("%s", "                              [ --tests TESTS | -t SRC]");
+        printf("%s", " [ --main MAIN | -m MAIN]\n");
+        printf("%c", '\n');
         printf("%s", "Generate different types of Makefiles\n");
         printf("%s", "\n");
         printf("%s", "Positional arguments:\n");
@@ -123,6 +134,9 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
         printf("%s", "\n");
         printf("%s", "Options:\n");
         printf("\t--help, -h\t\tdisplay this message\n");
+        printf("\t--src, -s\t\tthe directory containing source code\n");
+        printf("\t--tests, -t\t\tthe directory containing test programs\n");
+        printf("\t--main, -m\t\tthe file containing the entry point\n");
 
         exit(EXIT_FAILURE);
     }

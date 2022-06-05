@@ -275,4 +275,29 @@ int makegen_enumerate_dialect(const char *string);
 */
 int makegen_enumerate_target(const char *string);
 
+/*
+ * @docgen: function
+ * @brief: retrieve an option's value and a default if its not given
+ * @name: makegen_get_option_with_default
+ *
+ * @param parser: the argument parser
+ * @type: struct ArgparseParser
+ *
+ * @param longform: the long form of the option
+ * @type: const char *
+ *
+ * @param shortform: the short form of the option
+ * @type: const char *
+ *
+ * @param default: the default if the option is not given to the program
+ * @type: const char *
+ *
+ * @return: the value to the option or the default
+ * @type: const char *
+*/
+const char *makegen_get_option_with_default(struct ArgparseParser parser,
+                                            const char *longform,
+                                            const char *shortform,
+                                            const char *default_option);
+
 #endif
