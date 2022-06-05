@@ -320,16 +320,24 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
 
     /* Dump some variables */
     fprintf(location, "%s", "CC=cc\n");
+    fprintf(location, "%s", "CFLAGS=\n");
+    fprintf(location, "%s", "PREFIX=/usr/local\n");
     fprintf(location, "%s", "\n");
 
-    /* Dump some other rules */
+    /* Dump the clean rule */
     fprintf(location, "all: $(OBJS) $(TESTS) %s\n\n", binary_name);
     fprintf(location, "%s", "clean:\n");
     fprintf(location, "%s", "\trm -rf $(OBJS)\n");
     fprintf(location, "%s", "\trm -rf $(TESTS)\n");
     fprintf(location, "%s", "\trm -rf vgcore.*\n");
+    fprintf(location, "%s", "\trm -rf core*\n");
     fprintf(location, "\trm -rf %s\n\n", binary_name);
-    
+
+    /* Dump the install rule */
+    fprintf(location, "%s", "install:\n");
+    fprintf(location, "%s", "\tmkdir -p $(PREFIX)\n");
+    fprintf(location, "%s", "\tmkdir -p $(PREFIX)/bin\n");
+    fprintf(location, "%s", "\tinstall makegen $(PREFIX)/bin -m 755\n\n");
 
     /* Dump different targets */
     dump_tests_targets(location, parser, files);
