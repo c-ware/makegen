@@ -116,6 +116,7 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
     argparse_add_option(&parser, "--src", "-s", 1);
     argparse_add_option(&parser, "--tests", "-t", 1);
     argparse_add_option(&parser, "--main", "-m", 1);
+    argparse_add_option(&parser, "--binary", "-b", 1);
 
     /* Display a help message */
     if(argparse_option_exists(parser, "--help") != 0 ||
@@ -125,6 +126,7 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
         printf("%s", " [ --src SRC | -s SRC]\n");
         printf("%s", "                              [ --tests TESTS | -t SRC]");
         printf("%s", " [ --main MAIN | -m MAIN]\n");
+        printf("%s", "                              [ --binary BINARY | -b BINARY]\n");
         printf("%c", '\n');
         printf("%s", "Generate different types of Makefiles\n");
         printf("%s", "\n");
@@ -137,6 +139,7 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
         printf("\t--src, -s\t\tthe directory containing source code\n");
         printf("\t--tests, -t\t\tthe directory containing test programs\n");
         printf("\t--main, -m\t\tthe file containing the entry point\n");
+        printf("\t--binary, -b\t\tthe name of the binary\n");
 
         exit(EXIT_FAILURE);
     }
