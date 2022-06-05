@@ -79,17 +79,64 @@ void makegen_build_stddir_path(struct ArgparseParser parser, const char *longfor
     abort();
 }
 
-void dump_objs_variable(FILE *location, struct FilesystemPaths files) {
+void dump_objs_variable(FILE *location, struct ArgparseParser parser,
+                        struct FilesystemPaths files) {
     int index = 0;
+    char source_path[PATH_LENGTH + 1] = "";
     char object_path[PATH_LENGTH + 1];
 
     fprintf(location, "%s", "OBJS=");
+    makegen_build_stddir_path(parser, "--src", "-s", "./src", source_path, PATH_LENGTH);
 
     for(index = 0; index < carray_length(&files); index++) {
         struct FilesystemPath file = files.contents[index];
 
+        /* File has to be inside of the source directory */
+        if(strstarts(file.path, source_path) == 0)
+            continue;
+
         /* Has to be a C file */
         if(file.path[strlen(file.path) - 2] != '.' || file.path[strlen(file.path) - 1] != 'c')
+            continue;
+
+        /* Make it a .o file */
+        strncpy(object_path, file.path, PATH_LENGTH);
+        object_path[strlen(object_path) - 1] = 'o';
+
+
+        fprintf(location, "%s", object_path);
+
+        if(index != carray_length(&files))
+            fprintf(location, "%s", " ");
+    }
+
+    fprintf(location, "%c", '\n');
+}
+
+void dump_testobjs_variable(FILE *location, struct ArgparseParser parser,   
+                            struct FilesystemPaths files) {
+    int index = 0;
+    char main_path[PATH_LENGTH + 1] = "";
+    char source_path[PATH_LENGTH + 1] = "";
+    char object_path[PATH_LENGTH + 1] = "";
+
+    fprintf(location, "%s", "TESTOBJS=");
+    makegen_build_stddir_path(parser, "--main", "-m", "./src/main.c", main_path, PATH_LENGTH);
+    makegen_build_stddir_path(parser, "--src", "-s", "./src", source_path, PATH_LENGTH);
+
+    for(index = 0; index < carray_length(&files); index++) {
+        struct FilesystemPath file = files.contents[index];
+
+        /* File has to be inside of the source directory */
+        if(strstarts(file.path, source_path) == 0)
+            continue;
+
+        /* Has to be a C file */
+        if(file.path[strlen(file.path) - 2] != '.' || file.path[strlen(file.path) - 1] != 'c')
+            continue;
+
+        /* Must not be main.c */
+        if(strcmp(file.path, main_path) == 0)
             continue;
 
         /* Make it a .o file */
@@ -122,7 +169,7 @@ void dump_source_targets(FILE *location, struct ArgparseParser parser,
     struct Inclusions *file_inclusions = NULL;
 
     file_inclusions = carray_init(file_inclusions, INCLUSION);
-    build_stddir_path(parser, "--src", "-s", "./src", source_path, PATH_LENGTH);
+    makegen_build_stddir_path(parser, "--src", "-s", "./src", source_path, PATH_LENGTH);
 
     /* Dump targets for each file */
     for(index = 0; index < carray_length(&files); index++) {
@@ -167,17 +214,64 @@ void dump_source_targets(FILE *location, struct ArgparseParser parser,
     carray_free(file_inclusions, INCLUSION);
 }
 
+/*
+ * Dump the targets that convert all test files in the `tests`
+ * directory into a binary file in the same location.
+ *
+ * @param location: the file to dump the targets to
+ * @param parser: the argument parser
+ * @param files: the files in the project
+*/
+void dump_tests_targets(FILE *location, struct ArgparseParser parser,
+                         struct FilesystemPaths files) {
+    int index = 0;
+    char tests_path[PATH_LENGTH + 1] = "";
+
+    makegen_build_stddir_path(parser, "--tests", "-t", "./tests", tests_path, PATH_LENGTH);
+
+    /* Dump targets for each file */
+    for(index = 0; index < carray_length(&files); index++) {
+        int file_index = 0;
+        char source_file[PATH_LENGTH + 1] = "";
+        char binary_file[PATH_LENGTH + 1] = "";
+        struct FilesystemPath file = files.contents[index];
+
+        /* File has to be inside of the tests directory */
+        if(strstarts(file.path, tests_path) == 0)
+            continue;
+
+        /* Has to be a C file */
+        if(file.path[strlen(file.path) - 2] != '.' || file.path[strlen(file.path) - 1] != 'c')
+            continue;
+
+        /* Create paths */
+        strncpy(source_file, file.path, PATH_LENGTH);
+        strncpy(binary_file, file.path, PATH_LENGTH);
+
+        /* Strip off the '.c' since binary files should have no extension */
+        binary_file[strlen(binary_file) - 2] = '\0';
+
+        /* FILE: FILE.c $(TESTOBJS) */
+        fprintf(location, "%s: %s $(TESTOBJS)", binary_file, source_file);
+        fprintf(location, "%c", '\n');
+        fprintf(location, "\t$(CC) %s -o %s $(CFLAGS)\n", source_file, binary_file);
+        fprintf(location, "%c", '\n');
+    }
+}
+
 void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths files) {
     FILE *location = stdout;
 
-
-    dump_objs_variable(location, files);
+    /* Dump variables that need to be 'collected' */
+    dump_objs_variable(location, parser, files);
+    dump_testobjs_variable(location, parser, files);
 
     /* Dump some variables */
     fprintf(location, "%s", "CC=cc\n");
     fprintf(location, "%s", "\n\n");
-    fprintf(location, "%s", "all: $(OBJS)\n\n");
+    fprintf(location, "%s", "all: $(OBJS) $(TESTS)\n\n");
 
+    /* Dump different targets */
+    dump_tests_targets(location, parser, files);
     dump_source_targets(location, parser, files);
-
 }
