@@ -117,6 +117,7 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
     argparse_add_option(&parser, "--tests", "-t", 1);
     argparse_add_option(&parser, "--main", "-m", 1);
     argparse_add_option(&parser, "--binary", "-b", 1);
+    argparse_add_option(&parser, "--shared-obj", "-o", 1);
 
     /* Display a help message */
     if(argparse_option_exists(parser, "--help") != 0 ||
@@ -126,7 +127,8 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
         printf("%s", " [ --src SRC | -s SRC]\n");
         printf("%s", "                              [ --tests TESTS | -t SRC]");
         printf("%s", " [ --main MAIN | -m MAIN]\n");
-        printf("%s", "                              [ --binary BINARY | -b BINARY]\n");
+        printf("%s", "                              [ --binary BINARY | -b BINARY]");
+        printf("%s", " [ --shared-obj SHARED-OBJ | -o SHARED-OBJ]\n");
         printf("%c", '\n');
         printf("%s", "Generate different types of Makefiles\n");
         printf("%s", "\n");
@@ -156,9 +158,23 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
 int main(int argc, char **argv) {
     struct FilesystemPaths *paths = NULL;
     struct ArgparseParser parser = setup_arguments(argc, argv);
+    const char *target = argparse_get_argument(parser, "target");
+    const char *dialect = argparse_get_argument(parser, "dialect");
 
     paths = collect_source_files();
-    unix_project_makefile(parser, *paths);
+
+    /* Load the target maker */
+    switch(makegen_enumerate_target(target)) {
+        case MAKEGEN_TARGET_PROJECT:
+            unix_project_makefile(parser, *paths);
+
+            break;
+        case MAKEGEN_TARGET_LIBRARY:
+            unix_library_makefile(parser, *paths);
+
+            break;
+    }
+    
 
     argparse_free(parser);
     carray_free(paths, PATH_ARRAY);

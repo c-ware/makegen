@@ -37,15 +37,16 @@ struct FilesystemPaths;
 
 /*
  * @docgen: function
- * @brief: create a unix makefile
+ * @brief: create a unix makefile for a project.
  * @name: unix_project_makefile
  *
  * @description
- * @Create a new UNIX Makefile in the directory the program was launched in,
- * @which should be in the root of the project.
+ * @Create a new UNIX Makefile for a project. A 'project' is anything that will
+ * @intend to result in a final binary, like a user application. Makefiles that
+ * @are produced under this mode will have tests, and all object files compiled,
+ * @along with an installation target for the final binary, and a clean target
+ * @that will clean up things left by the build process.
  * @description
- *
- * @error: files is NULL
  *
  * @param parser: the argument parser to read arguments from
  * @type: struct ArgparseParser
@@ -54,5 +55,26 @@ struct FilesystemPaths;
  * @type: struct FilesystemPaths *
 */
 void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths files);
+
+
+/*
+ * @docgen: function
+ * @brief: create a unix makefile for a library
+ * @name: unix_library_makefile
+ *
+ * @description
+ * @Create a new UNIX Makefile for a library. I feel 'library' is more self
+ * @explanatory than just 'project' but in a simple way, libraries do not result
+ * @in a final binary. Rather, they are to be 'embedded' in a project which DOES
+ * @result in a final binary. Libraries are still allowed to have tests, though.
+ * @description
+ *
+ * @param parser: the argument parser to read arguments from
+ * @type: struct ArgparseParser
+ *
+ * @param files: the files to use to make the Makefile
+ * @type: struct FilesystemPaths *
+*/
+void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths files);
 
 #endif

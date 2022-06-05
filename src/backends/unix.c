@@ -255,9 +255,10 @@ void dump_source_targets(FILE *location, struct ArgparseParser parser,
  * @param location: the file to dump the targets to
  * @param parser: the argument parser
  * @param files: the files in the project
+ * @param objs: the name of the objs variable
 */
 void dump_tests_targets(FILE *location, struct ArgparseParser parser,
-                         struct FilesystemPaths files) {
+                        struct FilesystemPaths files, const char *objs) {
     int index = 0;
     char tests_path[PATH_LENGTH + 1] = "";
 
@@ -286,9 +287,9 @@ void dump_tests_targets(FILE *location, struct ArgparseParser parser,
         binary_file[strlen(binary_file) - 2] = '\0';
 
         /* FILE: FILE.c $(TESTOBJS) */
-        fprintf(location, "%s: %s $(TESTOBJS)", binary_file, source_file);
+        fprintf(location, "%s: %s $(%s)", binary_file, source_file, objs);
         fprintf(location, "%c", '\n');
-        fprintf(location, "\t$(CC) %s -o %s $(TESTOBJS) $(CFLAGS)\n", source_file, binary_file);
+        fprintf(location, "\t$(CC) %s -o %s $(%s) $(CFLAGS)\n", source_file, binary_file, objs);
         fprintf(location, "%c", '\n');
     }
 }
@@ -337,13 +338,60 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     fprintf(location, "%s", "install:\n");
     fprintf(location, "%s", "\tmkdir -p $(PREFIX)\n");
     fprintf(location, "%s", "\tmkdir -p $(PREFIX)/bin\n");
-    fprintf(location, "%s", "\tinstall makegen $(PREFIX)/bin -m 755\n\n");
+    fprintf(location, "\tinstall %s $(PREFIX)/bin -m 755\n\n", binary_name);
 
     /* Dump different targets */
-    dump_tests_targets(location, parser, files);
+    dump_tests_targets(location, parser, files, "TESTOBJS");
     dump_source_targets(location, parser, files);
 
     /* Dump binary build */
     fprintf(location, "%s: $(OBJS)\n", binary_name);
     fprintf(location, "\t$(CC) $(OBJS) -o %s\n", binary_name);
+}
+
+void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths files) {
+    FILE *location = stdout;
+    const char *sharedobj_name = NULL;
+
+    sharedobj_name = makegen_get_option_with_default(parser, "--shared-obj", "-o", NULL);
+
+    if(sharedobj_name == NULL) {
+        fprintf(stderr, "%s", "makegen: libraries must have the --shared-obj option given\n");
+        fprintf(stderr, "%s", "Try 'makegen --help' for more information.\n");
+
+        exit(EXIT_FAILURE);
+    }
+
+    /* Dump variables that need to be 'collected' */
+    dump_objs_variable(location, parser, files);
+    dump_tests_variable(location, parser, files);
+
+    /* Dump some variables */
+    fprintf(location, "%s", "CC=cc\n");
+    fprintf(location, "%s", "CFLAGS=-fpic\n");
+    fprintf(location, "%s", "PREFIX=/usr/local\n");
+    fprintf(location, "%s", "\n");
+
+    /* Dump the clean rule */
+    fprintf(location, "all: $(OBJS) $(TESTS) %s.so\n\n", sharedobj_name);
+    fprintf(location, "%s", "clean:\n");
+    fprintf(location, "%s", "\trm -rf $(OBJS)\n");
+    fprintf(location, "%s", "\trm -rf $(TESTS)\n");
+    fprintf(location, "%s", "\trm -rf vgcore.*\n");
+    fprintf(location, "%s", "\trm -rf core*\n");
+    fprintf(location, "\trm -rf %s.so\n\n", sharedobj_name);
+
+    /* Dump the install rule */
+    fprintf(location, "%s", "install:\n");
+    fprintf(location, "%s", "\tmkdir -p $(PREFIX)\n");
+    fprintf(location, "%s", "\tmkdir -p $(PREFIX)/lib\n");
+    fprintf(location, "\tinstall %s.so $(PREFIX)/lib -m 755\n\n", sharedobj_name);
+
+    /* Dump different targets */
+    dump_tests_targets(location, parser, files, "OBJS");
+    dump_source_targets(location, parser, files);
+
+    /* Dump shared object builder */
+    fprintf(location, "%s.so: $(OBJS)\n", sharedobj_name);
+    fprintf(location, "\t$(CC) $(OBJS) -shared -o %s.so\n", sharedobj_name);
 }

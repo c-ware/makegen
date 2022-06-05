@@ -27,6 +27,8 @@
 #ifndef CWARE_MAKEGEN_H
 #define CWARE_MAKEGEN_H
 
+#define CWARE_MAKEGEN_VERSION   "1.0.0"
+
 /* Common libraries */
 #include "carray.h"
 #include "cstack.h"
