@@ -17,7 +17,10 @@ clean:
 install:
 	mkdir -p $(PREFIX)
 	mkdir -p $(PREFIX)/bin
-	install makegen $(PREFIX)/bin -m 755
+	install -m 755 makegen $(PREFIX)/bin
+
+uninstall:
+	rm -f $(PREFIX)/bin/makegen
 
 ./src/header-extraction.o: ./src/header-extraction.c ./src/makegen.h
 	$(CC) -c ./src/header-extraction.c -o ./src/header-extraction.o $(CFLAGS)

@@ -24,6 +24,85 @@
  * POSSIBILITY OF SUCH DAMAGE.
 */
 
+/*
+ * @docgen: project
+ * @brief: generate makefiles for different dialects of make
+ * @name: makegen
+ *
+ * @arguments
+ * @makegen TARGET DIALECT [ --help | -h ] [ --src SRC | -s SRC]
+ * @                       [ --tests TESTS | -t TESTS ]
+ * @                       [ --main MAIN | -m MAIN]
+ * @                       [ --binary BINARY | -b BINARY]
+ * @                       [ --name NAME | -n NAME ]
+ * @arguments
+ *
+ * @description
+ * @A program designed to create Makefiles for many types of dialects of Make,
+ * @and for many different types of purposes. The Makefiles outputted are intended
+ * @to be used for the C programming language. As such, this program should be
+ * @used to generate Makefiles that build C applications, and libraries.
+ * @
+ * @This program originated as a collection of M4 macros that would be evaluated
+ * @from a template, and into a fully fledged Makefile. We originally did this
+ * @because we wanted to make sure our Makefiles were as portable as possible,
+ * @and common things that might be found in BSD Make (like variable modifiers,
+ * @and the != variable assignment operator), and in GNU Make (wildcard), did
+ * @not exist in POSIX make. So, we decided to write M4 macros that would be
+ * @pre-cooked so that the end user of the library or application did not need
+ * @to have M4 on their system to build the program.
+ * @
+ * @As primitive as this system sounds at first thought, it actually works quite
+ * @well. Although, it had several drawbacks. The first one is that it can easily
+ * @lead to inconsistency between the source and header files. With the way we
+ * @originally did it, the only dependency of any object file was the source
+ * @file itself, and not anything else. This was a problem because if you edited
+ * @the header file, you had to either re-compile the file manually (which
+ * @completely defeats the purpose of Make), or clean all object files and re-
+ * @build the program. This also stretches the purpose of Make.
+ * @
+ * @The other problem that we came across was that, well, our Makefiles were not
+ * @actually usable on NetBSD and OpenSolaris 10 from Oracle. This was because
+ * @these dialects of Make do not allow implicit rules (.c.o) to build files that
+ * @are in separate directory to the Makefile. This lead us to two main solutions
+ * @to this problem. The first was recursive Makefiles, where each Makefile would
+ * @only build dependencies in its directory, and call Make on any Makefiles in
+ * @child directories of the Makefile. This at first was promising, but we quickly
+ * @realized that this would very quickly become unmaintainable, and messy. This
+ * @was mostly because we would need to produce Makefiles for two main dialects
+ * @of Make-- POSIX Make, and nmake. The other solution, was to have a single
+ * @Makefile for each dialect of Make that we wanted to target. This would allow
+ * @us to create Makefiles for POSIX Make, without having to use recursive Make.
+ * @And thus, makegen was born.
+ * @
+ * @Makegen allows the programmer to automatically generate Makefiles which build
+ * @tests with all the object files of the program, build all source files into
+ * @object files, build and install libraries with shared objects and headers,
+ * @and more. All source files and tests have their direct inclusions extracted,
+ * @so it is harder (but still not impossible) for inconsistencies to arise in
+ * @the final product, as all directly included headers will be considered
+ * @dependencies of the object or test file.
+ * @
+ * @Here is a table of all types of all targets for this program.
+ * @table
+ * @sep: ;
+ * @Target;Description
+ * @library;generate a makefile for a library (does not have a final binary)
+ * @project;generate a makefile for a program (has a final binary)
+ * @table
+ * @
+ * @And the dialects of Make that this program can produce for the above
+ * @targets are as follows.
+ * @table
+ * @sep: ;
+ * @Dialect;Description
+ * @unix;generate a POSIX Make which is intended to be ran under a *NIX
+ * @table
+ * @description
+ *
+ * @reference: cware(cware)
+*/
+
 #include <dirent.h>
 #include <stdlib.h>
 
@@ -105,7 +184,7 @@ static struct FilesystemPaths *collect_source_files(void) {
 }
 
 struct ArgparseParser setup_arguments(int argc, char **argv) {
-    struct ArgparseParser parser = argparse_init("docgen", argc, argv);
+    struct ArgparseParser parser = argparse_init("makegen", argc, argv);
 
     /* Add some arguments */
     argparse_add_argument(&parser, "target");

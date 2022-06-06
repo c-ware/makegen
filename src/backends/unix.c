@@ -289,8 +289,10 @@ void dump_tests_targets(FILE *location, struct ArgparseParser parser,
                         struct FilesystemPaths files, const char *objs) {
     int index = 0;
     char tests_path[PATH_LENGTH + 1] = "";
+    struct Inclusions *file_inclusions = NULL;
 
     makegen_build_stddir_path(parser, "--tests", "-t", "./tests", tests_path, PATH_LENGTH);
+    file_inclusions = carray_init(file_inclusions, INCLUSION);
 
     /* Dump targets for each file */
     for(index = 0; index < carray_length(&files); index++) {
@@ -315,7 +317,23 @@ void dump_tests_targets(FILE *location, struct ArgparseParser parser,
         binary_file[strlen(binary_file) - 2] = '\0';
 
         /* FILE: FILE.c $(TESTOBJS) */
-        fprintf(location, "%s: %s $(%s)", binary_file, source_file, objs);
+        fprintf(location, "%s: %s", binary_file, source_file, objs);
+
+        /* Yank the files inclusions this file has out */
+        makegen_extract_inclusions_buffer(file.path, file_inclusions);
+
+        /* Dump included files */
+        for(file_index = 0; file_index < carray_length(file_inclusions); file_index++) {
+            char resolved_inclusion[PATH_LENGTH + 1] = "";
+            char *header = file_inclusions->contents[file_index].path;
+
+            makegen_resolve_path(file.path, header, resolved_inclusion, PATH_LENGTH);
+            fprintf(location, " %s ", resolved_inclusion);
+        }
+
+        fprintf(location, "$(%s)", objs);
+
+
         fprintf(location, "%c", '\n');
         fprintf(location, "\t$(CC) %s -o %s $(%s) $(CFLAGS)\n", source_file, binary_file, objs);
         fprintf(location, "%c", '\n');
