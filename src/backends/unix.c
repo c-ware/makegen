@@ -154,7 +154,7 @@ void dump_testobjs_variable(FILE *location, struct ArgparseParser parser,
 }
 
 void dump_tests_variable(FILE *location, struct ArgparseParser parser,
-                        struct FilesystemPaths files) {
+                         struct FilesystemPaths files) {
     int index = 0;
     char source_path[PATH_LENGTH + 1] = "";
     char tests_path[PATH_LENGTH + 1] = "";
@@ -179,6 +179,34 @@ void dump_tests_variable(FILE *location, struct ArgparseParser parser,
 
 
         fprintf(location, "%s", source_path);
+
+        if(index != carray_length(&files))
+            fprintf(location, "%s", " ");
+    }
+
+    fprintf(location, "%c", '\n');
+}
+
+void dump_headers_variable(FILE *location, struct ArgparseParser parser,
+                           struct FilesystemPaths files) {
+    int index = 0;
+    char source_path[PATH_LENGTH + 1] = "";
+
+    fprintf(location, "%s", "HEADERS=");
+    makegen_build_stddir_path(parser, "--src", "-s", "./src", source_path, PATH_LENGTH);
+
+    for(index = 0; index < carray_length(&files); index++) {
+        struct FilesystemPath file = files.contents[index];
+
+        /* File has to be inside of the source directory */
+        if(strstarts(file.path, source_path) == 0)
+            continue;
+
+        /* Has to be a .H file */
+        if(file.path[strlen(file.path) - 2] != '.' || file.path[strlen(file.path) - 1] != 'h')
+            continue;
+
+        fprintf(location, "%s", file.path);
 
         if(index != carray_length(&files))
             fprintf(location, "%s", " ");
@@ -338,7 +366,11 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     fprintf(location, "%s", "install:\n");
     fprintf(location, "%s", "\tmkdir -p $(PREFIX)\n");
     fprintf(location, "%s", "\tmkdir -p $(PREFIX)/bin\n");
-    fprintf(location, "\tinstall %s $(PREFIX)/bin -m 755\n\n", binary_name);
+    fprintf(location, "\tinstall -m 755 %s $(PREFIX)/bin\n\n", binary_name);
+
+    /* Dump the uninstall rule */
+    fprintf(location, "%s", "uninstall:\n");
+    fprintf(location, "\trm -f $(PREFIX)/bin/%s\n\n", binary_name);
 
     /* Dump different targets */
     dump_tests_targets(location, parser, files, "TESTOBJS");
@@ -351,12 +383,12 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
 
 void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths files) {
     FILE *location = stdout;
-    const char *sharedobj_name = NULL;
+    const char *library_name = NULL;
 
-    sharedobj_name = makegen_get_option_with_default(parser, "--shared-obj", "-o", NULL);
+    library_name = makegen_get_option_with_default(parser, "--name", "-n", NULL);
 
-    if(sharedobj_name == NULL) {
-        fprintf(stderr, "%s", "makegen: libraries must have the --shared-obj option given\n");
+    if(library_name == NULL) {
+        fprintf(stderr, "%s", "makegen: libraries must have the --name option given\n");
         fprintf(stderr, "%s", "Try 'makegen --help' for more information.\n");
 
         exit(EXIT_FAILURE);
@@ -365,6 +397,7 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     /* Dump variables that need to be 'collected' */
     dump_objs_variable(location, parser, files);
     dump_tests_variable(location, parser, files);
+    dump_headers_variable(location, parser, files);
 
     /* Dump some variables */
     fprintf(location, "%s", "CC=cc\n");
@@ -373,25 +406,33 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     fprintf(location, "%s", "\n");
 
     /* Dump the clean rule */
-    fprintf(location, "all: $(OBJS) $(TESTS) %s.so\n\n", sharedobj_name);
+    fprintf(location, "all: $(OBJS) $(TESTS) %s.so\n\n", library_name);
     fprintf(location, "%s", "clean:\n");
     fprintf(location, "%s", "\trm -rf $(OBJS)\n");
     fprintf(location, "%s", "\trm -rf $(TESTS)\n");
     fprintf(location, "%s", "\trm -rf vgcore.*\n");
     fprintf(location, "%s", "\trm -rf core*\n");
-    fprintf(location, "\trm -rf %s.so\n\n", sharedobj_name);
+    fprintf(location, "\trm -rf %s.so\n\n", library_name);
 
     /* Dump the install rule */
     fprintf(location, "%s", "install:\n");
     fprintf(location, "%s", "\tmkdir -p $(PREFIX)\n");
     fprintf(location, "%s", "\tmkdir -p $(PREFIX)/lib\n");
-    fprintf(location, "\tinstall %s.so $(PREFIX)/lib -m 755\n\n", sharedobj_name);
+    fprintf(location, "%s", "\tmkdir -p $(PREFIX)/include\n");
+    fprintf(location, "\tmkdir -p $(PREFIX)/include/%s\n", library_name);
+    fprintf(location, "\tinstall -m 755 %s.so $(PREFIX)/lib\n", library_name);
+    fprintf(location, "\tinstall -m 644 $(HEADERS) $(PREFIX)/include/%s\n\n", library_name);
+
+    /* Dump the uninstall rule */
+    fprintf(location, "%s", "uninstall:\n");
+    fprintf(location, "\trm -rf $(PREFIX)/include/%s\n", library_name);
+    fprintf(location, "\trm -f $(PREFIX)/lib/%s.so\n\n", library_name);
 
     /* Dump different targets */
     dump_tests_targets(location, parser, files, "OBJS");
     dump_source_targets(location, parser, files);
 
     /* Dump shared object builder */
-    fprintf(location, "%s.so: $(OBJS)\n", sharedobj_name);
-    fprintf(location, "\t$(CC) $(OBJS) -shared -o %s.so\n", sharedobj_name);
+    fprintf(location, "%s.so: $(OBJS)\n", library_name);
+    fprintf(location, "\t$(CC) $(OBJS) -shared -o %s.so\n", library_name);
 }

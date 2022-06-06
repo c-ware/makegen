@@ -117,7 +117,7 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
     argparse_add_option(&parser, "--tests", "-t", 1);
     argparse_add_option(&parser, "--main", "-m", 1);
     argparse_add_option(&parser, "--binary", "-b", 1);
-    argparse_add_option(&parser, "--shared-obj", "-o", 1);
+    argparse_add_option(&parser, "--name", "-n", 1);
 
     /* Display a help message */
     if(argparse_option_exists(parser, "--help") != 0 ||
@@ -128,7 +128,7 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
         printf("%s", "                              [ --tests TESTS | -t SRC]");
         printf("%s", " [ --main MAIN | -m MAIN]\n");
         printf("%s", "                              [ --binary BINARY | -b BINARY]");
-        printf("%s", " [ --shared-obj SHARED-OBJ | -o SHARED-OBJ]\n");
+        printf("%s", " [ --name NAME | -n NAME ]\n");
         printf("%c", '\n');
         printf("%s", "Generate different types of Makefiles\n");
         printf("%s", "\n");
@@ -137,11 +137,12 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
         printf("%s", "\tdialect\t\t\tthe dialect of Makefile to create\n");
         printf("%s", "\n");
         printf("%s", "Options:\n");
-        printf("\t--help, -h\t\tdisplay this message\n");
-        printf("\t--src, -s\t\tthe directory containing source code\n");
-        printf("\t--tests, -t\t\tthe directory containing test programs\n");
-        printf("\t--main, -m\t\tthe file containing the entry point\n");
-        printf("\t--binary, -b\t\tthe name of the binary\n");
+        printf("%s", "\t--help, -h\t\tdisplay this message\n");
+        printf("%s", "\t--src, -s\t\tthe directory containing source code\n");
+        printf("%s", "\t--tests, -t\t\tthe directory containing test programs\n");
+        printf("%s", "\t--main, -m\t\tthe file containing the entry point\n");
+        printf("%s", "\t--binary, -b\t\tthe name of the binary\n");
+        printf("%s", "\t--name, -n\t\tthe name of the library and shared object\n");
 
         exit(EXIT_FAILURE);
     }
