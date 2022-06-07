@@ -348,14 +348,4 @@ void makegen_verify_project_options(struct ArgparseParser parser);
 */
 void makegen_verify_library_options(struct ArgparseParser parser);
 
-
-
-
-
-
-
-
-
-
-
 #endif
