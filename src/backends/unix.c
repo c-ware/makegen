@@ -344,21 +344,8 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     FILE *location = stdout;
     const char *binary_name = NULL;
 
+    makegen_verify_project_options(parser);
     binary_name = makegen_get_option_with_default(parser, "--binary", "-b", NULL);
-
-    if(binary_name == NULL) {
-        fprintf(stderr, "%s", "makegen: projects must have --binary and --main options given\n");
-        fprintf(stderr, "%s", "Try 'makegen --help' for more information.\n");
-
-        exit(EXIT_FAILURE);
-    }
-
-    if(makegen_get_option_with_default(parser, "--main", "-m", NULL) == NULL) {
-        fprintf(stderr, "%s", "makegen: projects must have --binary and --main options given\n");
-        fprintf(stderr, "%s", "Try 'makegen --help' for more information.\n");
-
-        exit(EXIT_FAILURE);
-    }
 
     /* Dump variables that need to be 'collected' */
     dump_objs_variable(location, parser, files);
@@ -403,14 +390,8 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     FILE *location = stdout;
     const char *library_name = NULL;
 
+    makegen_verify_library_options(parser);
     library_name = makegen_get_option_with_default(parser, "--name", "-n", NULL);
-
-    if(library_name == NULL) {
-        fprintf(stderr, "%s", "makegen: libraries must have the --name option given\n");
-        fprintf(stderr, "%s", "Try 'makegen --help' for more information.\n");
-
-        exit(EXIT_FAILURE);
-    }
 
     /* Dump variables that need to be 'collected' */
     dump_objs_variable(location, parser, files);

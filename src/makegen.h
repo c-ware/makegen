@@ -302,4 +302,60 @@ const char *makegen_get_option_with_default(struct ArgparseParser parser,
                                             const char *shortform,
                                             const char *default_option);
 
+/*
+ * @docgen: function
+ * @brief: verify that all required options are given to the project
+ * @name: makegen_verify_project_options
+ *
+ * @description
+ * @Verify that all options that a project generator needs to correctly
+ * @produce a Makefile (that cannot have sane defaults) are given to the
+ * @program. A project generator will require the following options:
+ * @
+ * @--binary, -b
+ * @    The name of the final binary
+ * @
+ * @--main, -m
+ * @    The path to the main file
+ * @description
+ *
+ * @error: --binary or -b are not given to the program
+ * @error: --main or -m are not given to the program
+ *
+ * @param parser: the argument parser that contains the argv
+ * @type: struct ArgparseParser
+*/
+void makegen_verify_project_options(struct ArgparseParser parser);
+
+/*
+ * @docgen: function
+ * @brief: verify that all required options are given to the library
+ * @name: makegen_verify_library_options
+ *
+ * @description
+ * @Verify that all options that a library generator needs to correctly
+ * @produce a Makefile (that cannot have sane defaults) are given to the
+ * @program. A library generator will require the following options:
+ * @
+ * @--name, -n
+ * @    The name of the library-- also used as the shared object name
+ * @description
+ *
+ * @error: --name or -n are not given to the program
+ *
+ * @param parser: the argument parser that contains the argv
+ * @type: struct ArgparseParser
+*/
+void makegen_verify_project_options(struct ArgparseParser parser);
+
+
+
+
+
+
+
+
+
+
+
 #endif
