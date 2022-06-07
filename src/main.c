@@ -91,6 +91,19 @@
  * @project;generate a makefile for a program (has a final binary)
  * @table
  * @
+ * @Some targets will require certain options to give further information about
+ * @how to generate the final Makefile. What follows is a table of what each
+ * @target requires in terms of options. Only long-form options are given, so
+ * @please scroll down for explanations of all the options that this program
+ * @will expect.
+ * @
+ * @table
+ * @sep: ;
+ * @Target;Required;Optional
+ * @project;--binary, --main;--src, --tests
+ * @library;--name;--src, --tests
+ * @table
+ * @
  * @And the dialects of Make that this program can produce for the above
  * @targets are as follows.
  * @table
@@ -98,6 +111,30 @@
  * @Dialect;Description
  * @unix;generate a POSIX Make which is intended to be ran under a *NIX
  * @table
+ * @
+ * @This program can accept the following options. Please see the synopsis for
+ * @all the parameters they take. It should be noted that not all of these options
+ * @make sense, or do anything on their own. However, they should make sense in
+ * @the context of the target they are associated with (see the second table
+ * @above for more information for what targets require what options)
+ * @
+ * @--help, -h
+ * @    Display a smaller help menu
+ * @
+ * @--src, -s
+ * @    The path to the source directory
+ * @
+ * @--tests, -t
+ * @    The path to the tests directory
+ * @
+ * @--main, -m
+ * @    The path to the file with the entry point of the program
+ * @
+ * @--binary, -b
+ * @    The name of the final binary of the program
+ * @
+ * @--name, -n
+ * @    The name of the library, and shared object
  * @description
  *
  * @reference: cware(cware)
@@ -254,7 +291,6 @@ int main(int argc, char **argv) {
 
             break;
     }
-    
 
     argparse_free(parser);
     carray_free(paths, PATH_ARRAY);

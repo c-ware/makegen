@@ -67,3 +67,28 @@ const char *makegen_get_option_with_default(struct ArgparseParser parser,
 
     return default_option;
 }
+
+void makegen_verify_project_options(struct ArgparseParser parser) {
+    if(makegen_get_option_with_default(parser, "--binary", "-b", NULL)  == NULL) {
+        fprintf(stderr, "%s", "makegen: projects must have --binary and --main options given\n");
+        fprintf(stderr, "%s", "Try 'makegen --help' for more information.\n");
+
+        exit(EXIT_FAILURE);
+    }
+
+    if(makegen_get_option_with_default(parser, "--main", "-m", NULL) == NULL) {
+        fprintf(stderr, "%s", "makegen: projects must have --binary and --main options given\n");
+        fprintf(stderr, "%s", "Try 'makegen --help' for more information.\n");
+
+        exit(EXIT_FAILURE);
+    }
+}
+
+void makegen_verify_library_options(struct ArgparseParser parser) {
+    if(makegen_get_option_with_default(parser, "--name", "-n", NULL) == NULL) {
+        fprintf(stderr, "%s", "makegen: libraries must have the --name option given\n");
+        fprintf(stderr, "%s", "Try 'makegen --help' for more information.\n");
+
+        exit(EXIT_FAILURE);
+    }
+}
