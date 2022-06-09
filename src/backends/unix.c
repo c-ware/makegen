@@ -401,7 +401,7 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
 
     /* Dump binary build */
     fprintf(location, "%s: $(OBJS)\n", binary_name);
-    fprintf(location, "\t$(CC) $(OBJS) -o %s\n", binary_name);
+    fprintf(location, "\t$(CC) $(OBJS) -o %s $(LDFLAGS) $(LDLIBS)\n", binary_name);
 }
 
 void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths files) {

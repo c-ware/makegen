@@ -19,6 +19,7 @@ VERSION: 1.0.1
 - Headers are no longer executable (woop-de-doo)
 - Fixed memory leak from unreleased array
 - Fixed segfault from missing NULL at the end of a variadic argument
+- Adding LDFLAGS and LDLIBS to final binary for project Makefiles
 
 ## Misc
 - Added functions that verify the existence of all options that
