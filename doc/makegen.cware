@@ -1,4 +1,4 @@
-.TH "makegen" "cware" "June 07, 2022" "" "C-Ware Manuals"
+.TH "makegen" "cware" "June 09, 2022" "" "C-Ware Manuals"
 .SH NAME
 makegen - generate makefiles for different dialects of make
 .SH SYNOPSIS
@@ -7,6 +7,9 @@ makegen TARGET DIALECT [ --help | -h ] [ --src SRC | -s SRC]
                        [ --main MAIN | -m MAIN]
                        [ --binary BINARY | -b BINARY]
                        [ --name NAME | -n NAME ]
+                       [ --ldflags FLAGS | -l FLAGS ]
+                       [ --ldlibs LIBS | -L LIBS ]
+                       [ --cflags FLAGS | -c FLAGS ]
 
 .br
 
@@ -93,8 +96,8 @@ _ _ _
 l l l 
 .
 Target;Required;Optional
-project;--binary, --main;--src, --tests
-library;--name;--src, --tests
+project;--binary, --main;--src, --tests, --ldflags, --ldlibs, --cflags
+library;--name;--src, --tests, --ldflags, --ldlibs, --cflags
 .TE
 
 And the dialects of Make that this program can produce for the above
@@ -132,6 +135,15 @@ above for more information for what targets require what options)
 
 --name, -n
     The name of the library, and shared object
+
+--ldflags, -l
+    The flags to pass to the linker
+
+--ldlibs, -L
+    The libraries to link in the program
+
+--cflags, -c
+    C compiler clags
 .SH SEE ALSO
 \fBcware\fR(cware)
 .br

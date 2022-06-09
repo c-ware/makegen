@@ -32,6 +32,14 @@
 #ifndef CWARE_MAKEGEN_BACKENDS_H
 #define CWARE_MAKEGEN_BACKENDS_H
 
+#define print_escaped_parameter(format, var) \
+    if((var) != NULL) {                      \
+        if((var)[0] == '\\')                 \
+            printf(format, var + 1);         \
+        else                                 \
+            printf(format, var);             \
+    }
+
 struct ArgparseParser;
 struct FilesystemPaths;
 

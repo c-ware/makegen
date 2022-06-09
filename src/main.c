@@ -35,6 +35,9 @@
  * @                       [ --main MAIN | -m MAIN]
  * @                       [ --binary BINARY | -b BINARY]
  * @                       [ --name NAME | -n NAME ]
+ * @                       [ --ldflags FLAGS | -l FLAGS ]
+ * @                       [ --ldlibs LIBS | -L LIBS ]
+ * @                       [ --cflags FLAGS | -c FLAGS ]
  * @arguments
  *
  * @description
@@ -100,8 +103,8 @@
  * @table
  * @sep: ;
  * @Target;Required;Optional
- * @project;--binary, --main;--src, --tests
- * @library;--name;--src, --tests
+ * @project;--binary, --main;--src, --tests, --ldflags, --ldlibs, --cflags
+ * @library;--name;--src, --tests, --ldflags, --ldlibs, --cflags
  * @table
  * @
  * @And the dialects of Make that this program can produce for the above
@@ -135,6 +138,15 @@
  * @
  * @--name, -n
  * @    The name of the library, and shared object
+ * @
+ * @--ldflags, -l
+ * @    The flags to pass to the linker
+ * @
+ * @--ldlibs, -L
+ * @    The libraries to link in the program
+ * @
+ * @--cflags, -c
+ * @    C compiler clags
  * @description
  *
  * @reference: cware(cware)
@@ -152,7 +164,7 @@ void push_literal(struct PathStack *directories, const char *literal) {
 
     INIT_VARIABLE(new_path);
 
-    if(libpath_join_path(new_path.path, PATH_LENGTH, literal) == PATH_LENGTH) {
+    if(libpath_join_path(new_path.path, PATH_LENGTH, literal, NULL) == PATH_LENGTH) {
         fprintf(stderr, "push_literal: literal '%s' too long\n", literal);
         abort();
     }
@@ -234,6 +246,9 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
     argparse_add_option(&parser, "--main", "-m", 1);
     argparse_add_option(&parser, "--binary", "-b", 1);
     argparse_add_option(&parser, "--name", "-n", 1);
+    argparse_add_option(&parser, "--ldflags", "-l", 1);
+    argparse_add_option(&parser, "--ldlibs", "-L", 1);
+    argparse_add_option(&parser, "--cflags", "-c", 1);
 
     /* Display a help message */
     if(argparse_option_exists(parser, "--help") != 0 ||
@@ -241,10 +256,13 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
 
         printf("%s", "Usage: makegen TARGET DIALECT [ --help | -h ]");
         printf("%s", " [ --src SRC | -s SRC]\n");
-        printf("%s", "                              [ --tests TESTS | -t SRC]");
-        printf("%s", " [ --main MAIN | -m MAIN]\n");
-        printf("%s", "                              [ --binary BINARY | -b BINARY]");
+        printf("%s", "                              [ --tests TESTS | -t SRC ]");
+        printf("%s", " [ --main MAIN | -m MAIN ]\n");
+        printf("%s", "                              [ --binary BINARY | -b BINARY ]");
         printf("%s", " [ --name NAME | -n NAME ]\n");
+        printf("%s", "                              [ --ldflags FLAGS | -l FLAGS ]");
+        printf("%s", " [ --ldlibs LIBS | -L LIBS ]\n");
+        printf("%s", "                              [ --cflags FLAGS | -c FLAGS ]\n");
         printf("%c", '\n');
         printf("%s", "Generate different types of Makefiles\n");
         printf("%s", "\n");
@@ -259,6 +277,9 @@ struct ArgparseParser setup_arguments(int argc, char **argv) {
         printf("%s", "\t--main, -m\t\tthe file containing the entry point\n");
         printf("%s", "\t--binary, -b\t\tthe name of the binary\n");
         printf("%s", "\t--name, -n\t\tthe name of the library and shared object\n");
+        printf("%s", "\t--ldflags, -l\t\tflags and options to pass to the linker\n");
+        printf("%s", "\t--ldlibs, -L\t\tlibraries to link\n");
+        printf("%s", "\t--cflags, -c\t\tflags and options to pass to the compiler\n");
 
         exit(EXIT_FAILURE);
     }

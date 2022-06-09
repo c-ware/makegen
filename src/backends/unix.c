@@ -269,7 +269,7 @@ void dump_source_targets(FILE *location, struct ArgparseParser parser,
         }
 
         fprintf(location, "%c", '\n');
-        fprintf(location, "\t$(CC) -c %s -o %s $(CFLAGS)\n", source_file, object_file);
+        fprintf(location, "\t$(CC) -c $(CFLAGS) %s -o %s $(LDFLAGS) $(LDLIBS)\n", source_file, object_file);
         fprintf(location, "%c", '\n');
     }
 
@@ -335,16 +335,25 @@ void dump_tests_targets(FILE *location, struct ArgparseParser parser,
 
 
         fprintf(location, "%c", '\n');
-        fprintf(location, "\t$(CC) %s -o %s $(%s) $(CFLAGS)\n", source_file, binary_file, objs);
+        fprintf(location, "\t$(CC) %s -o %s $(%s) $(CFLAGS) $(LDFLAGS) $(LDLIBS)\n", source_file, binary_file, objs);
         fprintf(location, "%c", '\n');
     }
+
+    carray_free(file_inclusions, INCLUSION);
 }
 
 void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths files) {
     FILE *location = stdout;
     const char *binary_name = NULL;
+    const char *cflags = NULL;
+    const char *ldflags = NULL;
+    const char *ldlibs = NULL;
 
     makegen_verify_project_options(parser);
+
+    cflags = makegen_get_option_with_default(parser, "--cflags", "-c", NULL);
+    ldflags = makegen_get_option_with_default(parser, "--ldflags", "-l", NULL);
+    ldlibs = makegen_get_option_with_default(parser, "--ldlibs", "-L", NULL);
     binary_name = makegen_get_option_with_default(parser, "--binary", "-b", NULL);
 
     /* Dump variables that need to be 'collected' */
@@ -354,8 +363,17 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
 
     /* Dump some variables */
     fprintf(location, "%s", "CC=cc\n");
-    fprintf(location, "%s", "CFLAGS=\n");
     fprintf(location, "%s", "PREFIX=/usr/local\n");
+
+    /* Nullable variables. All of these ones provided here will all have
+     * parameters that start with hyphons, which will trigger argparse to
+     * consider it parameter-less. The way this program goes about solving
+     * this, is by having the first parameter start with a backslash, which
+     * is then skipped over if it exists when dumping the string.
+    */
+    print_escaped_parameter("LDFLAGS=%s\n", ldflags)
+    print_escaped_parameter("LDLIBS=%s\n", ldlibs)
+    print_escaped_parameter("CFLAGS=-fpic %s\n", cflags)
     fprintf(location, "%s", "\n");
 
     /* Dump the clean rule */
@@ -388,9 +406,16 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
 
 void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths files) {
     FILE *location = stdout;
+    const char *cflags = NULL;
+    const char *ldflags = NULL;
+    const char *ldlibs = NULL;
     const char *library_name = NULL;
 
     makegen_verify_library_options(parser);
+
+    cflags = makegen_get_option_with_default(parser, "--cflags", "-c", NULL);
+    ldflags = makegen_get_option_with_default(parser, "--ldflags", "-l", NULL);
+    ldlibs = makegen_get_option_with_default(parser, "--ldlibs", "-L", NULL);
     library_name = makegen_get_option_with_default(parser, "--name", "-n", NULL);
 
     /* Dump variables that need to be 'collected' */
@@ -400,8 +425,17 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
 
     /* Dump some variables */
     fprintf(location, "%s", "CC=cc\n");
-    fprintf(location, "%s", "CFLAGS=-fpic\n");
     fprintf(location, "%s", "PREFIX=/usr/local\n");
+
+    /* Nullable variables. All of these ones provided here will all have
+     * parameters that start with hyphons, which will trigger argparse to
+     * consider it parameter-less. The way this program goes about solving
+     * this, is by having the first parameter start with a backslash, which
+     * is then skipped over if it exists when dumping the string.
+    */
+    print_escaped_parameter("LDFLAGS=%s\n", ldflags)
+    print_escaped_parameter("LDLIBS=%s\n", ldlibs)
+    print_escaped_parameter("CFLAGS=-fpic %s\n", cflags)
     fprintf(location, "%s", "\n");
 
     /* Dump the clean rule */

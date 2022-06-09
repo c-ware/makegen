@@ -8,3 +8,4 @@ docgen project ./src/main.c --section cware  \
                             --title 'C-Ware Manuals' \
                             --date "`date +'%B %d, %Y'`"
 
+makegen project unix --binary makegen --main src/main.c > Makefile

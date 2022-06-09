@@ -7,6 +7,7 @@ VERSION: 1.0.1
 - Added header installation for libraries
 - Added uninstall target to library and project targets
 - Tests now have their inclusions as dependencies
+- Added CFLAGS, LDLIBS, and LDFLAGS options
 
 ## Documentation
 - Added makegen manual
@@ -16,6 +17,8 @@ VERSION: 1.0.1
 
 ## Bug fixes
 - Headers are no longer executable (woop-de-doo)
+- Fixed memory leak from unreleased array
+- Fixed segfault from missing NULL at the end of a variadic argument
 
 ## Misc
 - Added functions that verify the existence of all options that
