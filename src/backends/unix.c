@@ -269,7 +269,7 @@ void dump_source_targets(FILE *location, struct ArgparseParser parser,
         }
 
         fprintf(location, "%c", '\n');
-        fprintf(location, "\t$(CC) -c $(CFLAGS) %s -o %s $(LDFLAGS) $(LDLIBS)\n", source_file, object_file);
+        fprintf(location, "\t$(CC) -c $(CFLAGS) %s -o %s\n", source_file, object_file);
         fprintf(location, "%c", '\n');
     }
 
