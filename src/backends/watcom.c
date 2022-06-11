@@ -342,7 +342,8 @@ void dump_tests_targets(FILE *location, struct ArgparseParser parser,
 
 
         fprintf(location, "%c", '\n');
-        fprintf(location, "\t$(CC) %s -o %s $(%s) $(CFLAGS) $(LDFLAGS) $(LDLIBS)\n", source_file, binary_file, objs);
+        fprintf(location, "\t$(CC) -bt=$(SYSTEM) %s -o %s $(CFLAGS)\n", source_file, binary_file);
+        fprintf(location, "\t$(LD) system $(SYSTEM) name %s file {%s} $(LDFLAGS) $(LDLIBS)\n", binary_file, objs);
         fprintf(location, "%c", '\n');
     }
 
