@@ -439,7 +439,7 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     fprintf(location, "%s", "\n");
 
     /* Dump the clean rule */
-    fprintf(location, "all: $(OBJS) $(TESTS) %s.so\n\n", library_name);
+    fprintf(location, "all: $(OBJS) $(TESTS) %s.so %s.a\n\n", library_name, library_name);
     fprintf(location, "%s", "clean:\n");
     fprintf(location, "%s", "\trm -rf $(OBJS)\n");
     fprintf(location, "%s", "\trm -rf $(TESTS)\n");
@@ -454,12 +454,14 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     fprintf(location, "%s", "\tmkdir -p $(PREFIX)/include\n");
     fprintf(location, "\tmkdir -p $(PREFIX)/include/%s\n", library_name);
     fprintf(location, "\tinstall -m 755 %s.so $(PREFIX)/lib\n", library_name);
+    fprintf(location, "\tinstall -m 755 %s.a $(PREFIX)/lib\n", library_name);
     fprintf(location, "\tinstall -m 644 $(HEADERS) $(PREFIX)/include/%s\n\n", library_name);
 
     /* Dump the uninstall rule */
     fprintf(location, "%s", "uninstall:\n");
     fprintf(location, "\trm -rf $(PREFIX)/include/%s\n", library_name);
     fprintf(location, "\trm -f $(PREFIX)/lib/%s.so\n\n", library_name);
+    fprintf(location, "\trm -f $(PREFIX)/lib/%s.a\n\n", library_name);
 
     /* Dump different targets */
     dump_tests_targets(location, parser, files, "OBJS");
@@ -468,4 +470,10 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     /* Dump shared object builder */
     fprintf(location, "%s.so: $(OBJS)\n", library_name);
     fprintf(location, "\t$(CC) $(OBJS) -shared -o %s.so\n", library_name);
+
+    /* Dump archive builder */
+    fprintf(location, "%s.a: $(OBJS)\n", library_name);
+    fprintf(location, "\tar crv %s.a $(OBJS)\n", library_name);
+
 }
+
