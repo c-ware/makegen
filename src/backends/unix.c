@@ -373,7 +373,7 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     */
     print_escaped_parameter("LDFLAGS=%s\n", ldflags)
     print_escaped_parameter("LDLIBS=%s\n", ldlibs)
-    print_escaped_parameter("CFLAGS=-fpic %s\n", cflags)
+    print_escaped_parameter("CFLAGS=%s\n", cflags)
     fprintf(location, "%s", "\n");
 
     /* Dump the clean rule */
@@ -435,7 +435,7 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     */
     print_escaped_parameter("LDFLAGS=%s\n", ldflags)
     print_escaped_parameter("LDLIBS=%s\n", ldlibs)
-    print_escaped_parameter("CFLAGS=-fpic %s\n", cflags)
+    print_escaped_parameter("CFLAGS=%s\n", cflags)
     fprintf(location, "%s", "\n");
 
     /* Dump the clean rule */

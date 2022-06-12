@@ -24,3 +24,4 @@ VERSION: 1.0.1
 ## Misc
 - Added functions that verify the existence of all options that
   a project, and library Makefile will need, respectively.
+- Removed -fpic from base CFLAGS
