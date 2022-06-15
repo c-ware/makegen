@@ -25,7 +25,7 @@
 */
 
 /*
- * Contains the logic for producing Makefiles for UNIX.
+ * Contains the logic for producing Makefiles for Watcom Make.
 */
 
 #include "backends.h"
@@ -65,8 +65,8 @@ void makegen_build_stddir_path(struct ArgparseParser parser, const char *longfor
     standard_directory = makegen_get_option_with_default(parser, longform, shortform, default_path);
 
     /* Write with a prefix */
-    if(strstarts(standard_directory, "./") == 0)
-        written = libpath_join_path(buffer, length, "./", standard_directory, NULL);
+    if(strstarts(standard_directory, ".\\") == 0)
+        written = libpath_join_path(buffer, length, ".\\", standard_directory, NULL);
     else
         written = libpath_join_path(buffer, length, standard_directory, NULL);
 
@@ -83,10 +83,10 @@ void dump_objs_variable(FILE *location, struct ArgparseParser parser,
                         struct FilesystemPaths files) {
     int index = 0;
     char source_path[PATH_LENGTH + 1] = "";
-    char object_path[PATH_LENGTH + 1];
+    char object_path[PATH_LENGTH + 3];
 
     fprintf(location, "%s", "OBJS=");
-    makegen_build_stddir_path(parser, "--src", "-s", "./src", source_path, PATH_LENGTH);
+    makegen_build_stddir_path(parser, "--src", "-s", ".\\src", source_path, PATH_LENGTH);
 
     for(index = 0; index < carray_length(&files); index++) {
         struct FilesystemPath file = files.contents[index];
@@ -99,9 +99,11 @@ void dump_objs_variable(FILE *location, struct ArgparseParser parser,
         if(file.path[strlen(file.path) - 2] != '.' || file.path[strlen(file.path) - 1] != 'c')
             continue;
 
-        /* Make it a .o file */
+        /* Make it a .obj file */
         strncpy(object_path, file.path, PATH_LENGTH);
-        object_path[strlen(object_path) - 1] = 'o';
+        object_path[strlen(object_path) - 3] = 'o';
+        object_path[strlen(object_path) - 2] = 'b';
+        object_path[strlen(object_path) - 1] = 'j';
 
 
         fprintf(location, "%s", object_path);
@@ -118,11 +120,11 @@ void dump_testobjs_variable(FILE *location, struct ArgparseParser parser,
     int index = 0;
     char main_path[PATH_LENGTH + 1] = "";
     char source_path[PATH_LENGTH + 1] = "";
-    char object_path[PATH_LENGTH + 1] = "";
+    char object_path[PATH_LENGTH + 3] = "";
 
     fprintf(location, "%s", "TESTOBJS=");
-    makegen_build_stddir_path(parser, "--main", "-m", "./src/main.c", main_path, PATH_LENGTH);
-    makegen_build_stddir_path(parser, "--src", "-s", "./src", source_path, PATH_LENGTH);
+    makegen_build_stddir_path(parser, "--main", "-m", ".\\src\\main.c", main_path, PATH_LENGTH);
+    makegen_build_stddir_path(parser, "--src", "-s", ".\\src", source_path, PATH_LENGTH);
 
     for(index = 0; index < carray_length(&files); index++) {
         struct FilesystemPath file = files.contents[index];
@@ -141,7 +143,9 @@ void dump_testobjs_variable(FILE *location, struct ArgparseParser parser,
 
         /* Make it a .o file */
         strncpy(object_path, file.path, PATH_LENGTH);
-        object_path[strlen(object_path) - 1] = 'o';
+        object_path[strlen(object_path) - 3] = 'o';
+        object_path[strlen(object_path) - 2] = 'b';
+        object_path[strlen(object_path) - 1] = 'j';
 
 
         fprintf(location, "%s", object_path);
@@ -160,7 +164,7 @@ void dump_tests_variable(FILE *location, struct ArgparseParser parser,
     char tests_path[PATH_LENGTH + 1] = "";
 
     fprintf(location, "%s", "TESTS=");
-    makegen_build_stddir_path(parser, "--tests", "-t", "./tests", tests_path, PATH_LENGTH);
+    makegen_build_stddir_path(parser, "--tests", "-t", ".\\tests", tests_path, PATH_LENGTH);
 
     for(index = 0; index < carray_length(&files); index++) {
         struct FilesystemPath file = files.contents[index];
@@ -174,6 +178,7 @@ void dump_tests_variable(FILE *location, struct ArgparseParser parser,
             continue;
 
         /* Strip off the '.c' */
+        /* TODO: .exe properly */
         strncpy(source_path, file.path, PATH_LENGTH);
         source_path[strlen(source_path) - 2] = '\0';
 
@@ -193,7 +198,7 @@ void dump_headers_variable(FILE *location, struct ArgparseParser parser,
     char source_path[PATH_LENGTH + 1] = "";
 
     fprintf(location, "%s", "HEADERS=");
-    makegen_build_stddir_path(parser, "--src", "-s", "./src", source_path, PATH_LENGTH);
+    makegen_build_stddir_path(parser, "--src", "-s", ".\\src", source_path, PATH_LENGTH);
 
     for(index = 0; index < carray_length(&files); index++) {
         struct FilesystemPath file = files.contents[index];
@@ -231,13 +236,13 @@ void dump_source_targets(FILE *location, struct ArgparseParser parser,
     struct Inclusions *file_inclusions = NULL;
 
     file_inclusions = carray_init(file_inclusions, INCLUSION);
-    makegen_build_stddir_path(parser, "--src", "-s", "./src", source_path, PATH_LENGTH);
+    makegen_build_stddir_path(parser, "--src", "-s", ".\\src", source_path, PATH_LENGTH);
 
     /* Dump targets for each file */
     for(index = 0; index < carray_length(&files); index++) {
         int file_index = 0;
         char source_file[PATH_LENGTH + 1] = "";
-        char object_file[PATH_LENGTH + 1] = "";
+        char object_file[PATH_LENGTH + 3] = "";
         struct FilesystemPath file = files.contents[index];
 
         /* File has to be inside of the source directory */
@@ -251,7 +256,9 @@ void dump_source_targets(FILE *location, struct ArgparseParser parser,
         /* Create paths */
         strncpy(source_file, file.path, PATH_LENGTH);
         strncpy(object_file, file.path, PATH_LENGTH);
-        object_file[strlen(object_file) - 1] = 'o';
+        object_file[strlen(object_file) - 3] = 'o';
+        object_file[strlen(object_file) - 2] = 'b';
+        object_file[strlen(object_file) - 1] = 'j';
 
         /* FILE.o: FILE.c ... */
         fprintf(location, "%s: %s", object_file, source_file);
@@ -269,7 +276,7 @@ void dump_source_targets(FILE *location, struct ArgparseParser parser,
         }
 
         fprintf(location, "%c", '\n');
-        fprintf(location, "\t$(CC) -c $(CFLAGS) %s -o %s\n", source_file, object_file);
+        fprintf(location, "\t$(CC) -bt=$(SYSTEM) $(CFLAGS) %s -o %s\n", source_file, object_file);
         fprintf(location, "%c", '\n');
     }
 
@@ -335,19 +342,21 @@ void dump_tests_targets(FILE *location, struct ArgparseParser parser,
 
 
         fprintf(location, "%c", '\n');
-        fprintf(location, "\t$(CC) %s -o %s $(%s) $(CFLAGS) $(LDFLAGS) $(LDLIBS)\n", source_file, binary_file, objs);
+        fprintf(location, "\t$(CC) -bt=$(SYSTEM) %s -o %s $(CFLAGS)\n", source_file, binary_file);
+        fprintf(location, "\t$(LD) system $(SYSTEM) name %s file {%s} $(LDFLAGS) $(LDLIBS)\n", binary_file, objs);
         fprintf(location, "%c", '\n');
     }
 
     carray_free(file_inclusions, INCLUSION);
 }
 
-void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths files) {
+void watcom_project_makefile(struct ArgparseParser parser, struct FilesystemPaths files) {
     FILE *location = stdout;
     const char *binary_name = NULL;
     const char *cflags = NULL;
     const char *ldflags = NULL;
     const char *ldlibs = NULL;
+    const char *system = NULL;
 
     makegen_verify_project_options(parser);
 
@@ -355,6 +364,7 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     ldflags = makegen_get_option_with_default(parser, "--ldflags", "-l", NULL);
     ldlibs = makegen_get_option_with_default(parser, "--ldlibs", "-L", NULL);
     binary_name = makegen_get_option_with_default(parser, "--binary", "-b", NULL);
+    system = makegen_get_option_with_default(parser, "--system", "-s", "nt");
 
     /* Dump variables that need to be 'collected' */
     dump_objs_variable(location, parser, files);
@@ -362,11 +372,11 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     dump_tests_variable(location, parser, files);
 
     /* Dump some variables */
-    fprintf(location, "%s", "CC=cc\n");
-    fprintf(location, "%s", "PREFIX=/usr/local\n");
+    fprintf(location, "%s", "CC=wcc386\n");
+    fprintf(location, "%s", "LD=wlink\n");
 
     /* Nullable variables. All of these ones provided here will all have
-     * parameters that start with hyphons, which will trigger argparse to
+     * parameters that start with hyphens, which will trigger argparse to
      * consider it parameter-less. The way this program goes about solving
      * this, is by having the first parameter start with a backslash, which
      * is then skipped over if it exists when dumping the string.
@@ -374,42 +384,33 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     print_escaped_parameter("LDFLAGS=%s\n", ldflags)
     print_escaped_parameter("LDLIBS=%s\n", ldlibs)
     print_escaped_parameter("CFLAGS=%s\n", cflags)
+    print_escaped_parameter("SYSTEM=%s\n", system)
     fprintf(location, "%s", "\n");
 
     /* Dump the clean rule */
     fprintf(location, "all: $(OBJS) $(TESTS) %s\n\n", binary_name);
     fprintf(location, "%s", "clean:\n");
-    fprintf(location, "%s", "\trm -rf $(OBJS)\n");
-    fprintf(location, "%s", "\trm -rf $(TESTS)\n");
-    fprintf(location, "%s", "\trm -rf vgcore.*\n");
-    fprintf(location, "%s", "\trm -rf core*\n");
-    fprintf(location, "\trm -rf %s\n\n", binary_name);
-
-    /* Dump the install rule */
-    fprintf(location, "%s", "install:\n");
-    fprintf(location, "%s", "\tmkdir -p $(PREFIX)\n");
-    fprintf(location, "%s", "\tmkdir -p $(PREFIX)/bin\n");
-    fprintf(location, "\tinstall -m 755 %s $(PREFIX)/bin\n\n", binary_name);
-
-    /* Dump the uninstall rule */
-    fprintf(location, "%s", "uninstall:\n");
-    fprintf(location, "\trm -f $(PREFIX)/bin/%s\n\n", binary_name);
+    fprintf(location, "%s", "\tdel $(OBJS)\n");
+    fprintf(location, "%s", "\tdel $(TESTS)\n");
+    fprintf(location, "\tdel %s\n\n", binary_name);
 
     /* Dump different targets */
     dump_tests_targets(location, parser, files, "TESTOBJS");
     dump_source_targets(location, parser, files);
 
     /* Dump binary build */
+    /* TODO: make it right  */
     fprintf(location, "%s: $(OBJS)\n", binary_name);
-    fprintf(location, "\t$(CC) $(OBJS) -o %s $(LDFLAGS) $(LDLIBS)\n", binary_name);
+    fprintf(location, "\t$(LD) $(LDFLAGS) system $(SYSTEM) name %s file {$(OBJS)}\n", binary_name);
 }
 
-void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths files) {
+void watcom_library_makefile(struct ArgparseParser parser, struct FilesystemPaths files) {
     FILE *location = stdout;
     const char *cflags = NULL;
     const char *ldflags = NULL;
     const char *ldlibs = NULL;
     const char *library_name = NULL;
+    const char *system = NULL;
 
     makegen_verify_library_options(parser);
 
@@ -417,6 +418,7 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     ldflags = makegen_get_option_with_default(parser, "--ldflags", "-l", NULL);
     ldlibs = makegen_get_option_with_default(parser, "--ldlibs", "-L", NULL);
     library_name = makegen_get_option_with_default(parser, "--name", "-n", NULL);
+    system = makegen_get_option_with_default(parser, "--system", "-s", "nt");
 
     /* Dump variables that need to be 'collected' */
     dump_objs_variable(location, parser, files);
@@ -424,11 +426,12 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     dump_headers_variable(location, parser, files);
 
     /* Dump some variables */
-    fprintf(location, "%s", "CC=cc\n");
-    fprintf(location, "%s", "PREFIX=/usr/local\n");
+    fprintf(location, "%s", "CC=wcc386\n");
+    fprintf(location, "%s", "LD=wlink\n");
+    fprintf(location, "%s", "LIB=wlib\n");
 
     /* Nullable variables. All of these ones provided here will all have
-     * parameters that start with hyphons, which will trigger argparse to
+     * parameters that start with hyphens, which will trigger argparse to
      * consider it parameter-less. The way this program goes about solving
      * this, is by having the first parameter start with a backslash, which
      * is then skipped over if it exists when dumping the string.
@@ -439,41 +442,17 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     fprintf(location, "%s", "\n");
 
     /* Dump the clean rule */
-    fprintf(location, "all: $(OBJS) $(TESTS) %s.so %s.a\n\n", library_name, library_name);
+    fprintf(location, "all: $(OBJS) $(TESTS) %s.lib\n\n", library_name);
     fprintf(location, "%s", "clean:\n");
-    fprintf(location, "%s", "\trm -rf $(OBJS)\n");
-    fprintf(location, "%s", "\trm -rf $(TESTS)\n");
-    fprintf(location, "%s", "\trm -rf vgcore.*\n");
-    fprintf(location, "%s", "\trm -rf core*\n");
-    fprintf(location, "\trm -rf %s.so\n\n", library_name);
-
-    /* Dump the install rule */
-    fprintf(location, "%s", "install:\n");
-    fprintf(location, "%s", "\tmkdir -p $(PREFIX)\n");
-    fprintf(location, "%s", "\tmkdir -p $(PREFIX)/lib\n");
-    fprintf(location, "%s", "\tmkdir -p $(PREFIX)/include\n");
-    fprintf(location, "\tmkdir -p $(PREFIX)/include/%s\n", library_name);
-    fprintf(location, "\tinstall -m 755 %s.so $(PREFIX)/lib\n", library_name);
-    fprintf(location, "\tinstall -m 755 %s.a $(PREFIX)/lib\n", library_name);
-    fprintf(location, "\tinstall -m 644 $(HEADERS) $(PREFIX)/include/%s\n\n", library_name);
-
-    /* Dump the uninstall rule */
-    fprintf(location, "%s", "uninstall:\n");
-    fprintf(location, "\trm -rf $(PREFIX)/include/%s\n", library_name);
-    fprintf(location, "\trm -f $(PREFIX)/lib/%s.so\n\n", library_name);
-    fprintf(location, "\trm -f $(PREFIX)/lib/%s.a\n\n", library_name);
+    fprintf(location, "%s", "\tdel $(OBJS)\n");
+    fprintf(location, "%s", "\tdel $(TESTS)\n");
+    fprintf(location, "\tdel %s.lib\n\n", library_name);
 
     /* Dump different targets */
     dump_tests_targets(location, parser, files, "OBJS");
     dump_source_targets(location, parser, files);
 
     /* Dump shared object builder */
-    fprintf(location, "%s.so: $(OBJS)\n", library_name);
-    fprintf(location, "\t$(CC) $(OBJS) -shared -o %s.so\n", library_name);
-
-    /* Dump archive builder */
-    fprintf(location, "%s.a: $(OBJS)\n", library_name);
-    fprintf(location, "\tar crv %s.a $(OBJS)\n", library_name);
-
+    fprintf(location, "%s.lib: $(OBJS)\n", library_name);
+    fprintf(location, "\t$(LIB) %s +{$OBJS)}\n", library_name);
 }
-

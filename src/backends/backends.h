@@ -85,4 +85,90 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
 */
 void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths files);
 
+/*
+ * @docgen: function
+ * @brief: create a watcom makefile for a project.
+ * @name: watcom_project_makefile
+ *
+ * @description
+ * @Create a new Watcom Makefile for a project. A 'project' is anything that will
+ * @intend to result in a final binary, like a user application. Makefiles that
+ * @are produced under this mode will have tests, and all object files compiled,
+ * @along with an installation target for the final binary, and a clean target
+ * @that will clean up things left by the build process.
+ * @description
+ *
+ * @param parser: the argument parser to read arguments from
+ * @type: struct ArgparseParser
+ *
+ * @param files: the files to use to make the Makefile
+ * @type: struct FilesystemPaths *
+*/
+void watcom_project_makefile(struct ArgparseParser parser, struct FilesystemPaths files);
+
+
+/*
+ * @docgen: function
+ * @brief: create a watcom makefile for a library
+ * @name: watcom_library_makefile
+ *
+ * @description
+ * @Create a new Watcom Makefile for a library. I feel 'library' is more self
+ * @explanatory than just 'project' but in a simple way, libraries do not result
+ * @in a final binary. Rather, they are to be 'embedded' in a project which DOES
+ * @result in a final binary. Libraries are still allowed to have tests, though.
+ * @description
+ *
+ * @param parser: the argument parser to read arguments from
+ * @type: struct ArgparseParser
+ *
+ * @param files: the files to use to make the Makefile
+ * @type: struct FilesystemPaths *
+*/
+void watcom_library_makefile(struct ArgparseParser parser, struct FilesystemPaths files);
+
+
+
+/*
+ * @docgen: function
+ * @brief: create a MSVC makefile for a project.
+ * @name: msvc_project_makefile
+ *
+ * @description
+ * @Create a new MSVC Makefile for a project. A 'project' is anything that will
+ * @intend to result in a final binary, like a user application. Makefiles that
+ * @are produced under this mode will have tests, and all object files compiled,
+ * @along with an installation target for the final binary, and a clean target
+ * @that will clean up things left by the build process.
+ * @description
+ *
+ * @param parser: the argument parser to read arguments from
+ * @type: struct ArgparseParser
+ *
+ * @param files: the files to use to make the Makefile
+ * @type: struct FilesystemPaths *
+*/
+void msvc_project_makefile(struct ArgparseParser parser, struct FilesystemPaths files);
+
+
+/*
+ * @docgen: function
+ * @brief: create a MSVC makefile for a library
+ * @name: msvc_library_makefile
+ *
+ * @description
+ * @Create a new MSVC Makefile for a library. I feel 'library' is more self
+ * @explanatory than just 'project' but in a simple way, libraries do not result
+ * @in a final binary. Rather, they are to be 'embedded' in a project which DOES
+ * @result in a final binary. Libraries are still allowed to have tests, though.
+ * @description
+ *
+ * @param parser: the argument parser to read arguments from
+ * @type: struct ArgparseParser
+ *
+ * @param files: the files to use to make the Makefile
+ * @type: struct FilesystemPaths *
+*/
+void msvc_library_makefile(struct ArgparseParser parser, struct FilesystemPaths files);
+
 #endif
