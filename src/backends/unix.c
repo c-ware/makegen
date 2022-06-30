@@ -254,7 +254,7 @@ void dump_source_targets(FILE *location, struct ArgparseParser parser,
         object_file[strlen(object_file) - 1] = 'o';
 
         /* FILE.o: FILE.c ... */
-        fprintf(location, "%s: %s", object_file, source_file);
+        fprintf(location, "%s: %s", OFFSET_PATH(object_file), OFFSET_PATH(source_file));
 
         /* Yank the files inclusions this file has out */
         makegen_extract_inclusions_buffer(file.path, file_inclusions);
@@ -265,11 +265,11 @@ void dump_source_targets(FILE *location, struct ArgparseParser parser,
             char *header = file_inclusions->contents[file_index].path;
 
             makegen_resolve_path(file.path, header, resolved_inclusion, PATH_LENGTH);
-            fprintf(location, " %s", resolved_inclusion);
+            fprintf(location, " %s", OFFSET_PATH(resolved_inclusion));
         }
 
         fprintf(location, "%c", '\n');
-        fprintf(location, "\t$(CC) -c $(CFLAGS) %s -o %s $(LDFLAGS) $(LDLIBS)\n", source_file, object_file);
+        fprintf(location, "\t$(CC) -c $(CFLAGS) %s -o %s $(LDFLAGS) $(LDLIBS)\n", OFFSET_PATH(source_file), OFFSET_PATH(object_file));
         fprintf(location, "%c", '\n');
     }
 
@@ -317,7 +317,7 @@ void dump_tests_targets(FILE *location, struct ArgparseParser parser,
         binary_file[strlen(binary_file) - 2] = '\0';
 
         /* FILE: FILE.c $(TESTOBJS) */
-        fprintf(location, "%s: %s", binary_file, source_file, objs);
+        fprintf(location, "%s: %s", OFFSET_PATH(binary_file), OFFSET_PATH(source_file), objs);
 
         /* Yank the files inclusions this file has out */
         makegen_extract_inclusions_buffer(file.path, file_inclusions);
@@ -328,14 +328,14 @@ void dump_tests_targets(FILE *location, struct ArgparseParser parser,
             char *header = file_inclusions->contents[file_index].path;
 
             makegen_resolve_path(file.path, header, resolved_inclusion, PATH_LENGTH);
-            fprintf(location, " %s ", resolved_inclusion);
+            fprintf(location, " %s ", OFFSET_PATH(resolved_inclusion));
         }
 
         fprintf(location, "$(%s)", objs);
 
 
         fprintf(location, "%c", '\n');
-        fprintf(location, "\t$(CC) %s -o %s $(%s) $(CFLAGS) $(LDFLAGS) $(LDLIBS)\n", source_file, binary_file, objs);
+        fprintf(location, "\t$(CC) %s -o %s $(%s) $(CFLAGS) $(LDFLAGS) $(LDLIBS)\n", OFFSET_PATH(source_file), OFFSET_PATH(binary_file), objs);
         fprintf(location, "%c", '\n');
     }
 
