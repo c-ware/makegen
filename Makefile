@@ -1,5 +1,5 @@
-OBJS=./src/header-extraction.o ./src/common.o ./src/resolve.o ./src/main.o ./src/libmatch/read.o ./src/libmatch/cursor.o ./src/libmatch/match.o ./src/libmatch/conditions.o ./src/libpath/exists.o ./src/libpath/cwd.o ./src/libpath/mkdir.o ./src/libpath/join_path.o ./src/libpath/rmdir.o ./src/libpath/dirname.o ./src/libpath/is_directory.o ./src/libstring/starts.o ./src/libstring/replace.o ./src/libstring/strip.o ./src/libstring/reverse.o ./src/libstring/count.o ./src/backends/unix.o ./src/argparse/extractors.o ./src/argparse/argparse_internal.o ./src/argparse/argparse.o 
-TESTOBJS=./src/header-extraction.o ./src/common.o ./src/resolve.o ./src/libmatch/read.o ./src/libmatch/cursor.o ./src/libmatch/match.o ./src/libmatch/conditions.o ./src/libpath/exists.o ./src/libpath/cwd.o ./src/libpath/mkdir.o ./src/libpath/join_path.o ./src/libpath/rmdir.o ./src/libpath/dirname.o ./src/libpath/is_directory.o ./src/libstring/starts.o ./src/libstring/replace.o ./src/libstring/strip.o ./src/libstring/reverse.o ./src/libstring/count.o ./src/backends/unix.o ./src/argparse/extractors.o ./src/argparse/argparse_internal.o ./src/argparse/argparse.o 
+OBJS=src/header-extraction.o src/common.o src/resolve.o src/main.o src/libmatch/read.o src/libmatch/cursor.o src/libmatch/match.o src/libmatch/conditions.o src/libpath/exists.o src/libpath/cwd.o src/libpath/mkdir.o src/libpath/join_path.o src/libpath/rmdir.o src/libpath/dirname.o src/libpath/is_directory.o src/libstring/starts.o src/libstring/replace.o src/libstring/strip.o src/libstring/reverse.o src/libstring/count.o src/backends/unix.o src/argparse/extractors.o src/argparse/argparse_internal.o src/argparse/argparse.o 
+TESTOBJS=src/header-extraction.o src/common.o src/resolve.o src/libmatch/read.o src/libmatch/cursor.o src/libmatch/match.o src/libmatch/conditions.o src/libpath/exists.o src/libpath/cwd.o src/libpath/mkdir.o src/libpath/join_path.o src/libpath/rmdir.o src/libpath/dirname.o src/libpath/is_directory.o src/libstring/starts.o src/libstring/replace.o src/libstring/strip.o src/libstring/reverse.o src/libstring/count.o src/backends/unix.o src/argparse/extractors.o src/argparse/argparse_internal.o src/argparse/argparse.o 
 TESTS=
 CC=cc
 PREFIX=/usr/local
@@ -18,7 +18,6 @@ clean:
 
 install:
 	mkdir -p $(PREFIX)
-	mkdir -p $(PREFIX)/bin
 	install -m 755 makegen $(PREFIX)/bin
 
 uninstall:

@@ -40,6 +40,20 @@
             printf(format, var);             \
     }
 
+/*
+ * @docgen: macro_function
+ * @brief: offset the path, which should have `./`, two bytes forward
+ * @name: OFFSET_PATH
+ *
+ * @description
+ * @Offset the pointer of a string to be past the initial ./ which
+ * @each path should have. This is because on some platforms, the .
+ * @is not interpreted correctly.
+ * @description
+*/
+#define OFFSET_PATH(path) \
+    ((path) + 2)
+
 struct ArgparseParser;
 struct FilesystemPaths;
 

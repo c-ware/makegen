@@ -104,7 +104,7 @@ void dump_objs_variable(FILE *location, struct ArgparseParser parser,
         object_path[strlen(object_path) - 1] = 'o';
 
 
-        fprintf(location, "%s", object_path);
+        fprintf(location, "%s", OFFSET_PATH(object_path));
 
         if(index != carray_length(&files))
             fprintf(location, "%s", " ");
@@ -144,7 +144,7 @@ void dump_testobjs_variable(FILE *location, struct ArgparseParser parser,
         object_path[strlen(object_path) - 1] = 'o';
 
 
-        fprintf(location, "%s", object_path);
+        fprintf(location, "%s", OFFSET_PATH(object_path));
 
         if(index != carray_length(&files))
             fprintf(location, "%s", " ");
@@ -178,7 +178,7 @@ void dump_tests_variable(FILE *location, struct ArgparseParser parser,
         source_path[strlen(source_path) - 2] = '\0';
 
 
-        fprintf(location, "%s", source_path);
+        fprintf(location, "%s", OFFSET_PATH(source_path));
 
         if(index != carray_length(&files))
             fprintf(location, "%s", " ");
@@ -206,7 +206,7 @@ void dump_headers_variable(FILE *location, struct ArgparseParser parser,
         if(file.path[strlen(file.path) - 2] != '.' || file.path[strlen(file.path) - 1] != 'h')
             continue;
 
-        fprintf(location, "%s", file.path);
+        fprintf(location, "%s", OFFSET_PATH(file.path));
 
         if(index != carray_length(&files))
             fprintf(location, "%s", " ");
