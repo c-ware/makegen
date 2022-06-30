@@ -351,10 +351,10 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
 
     makegen_verify_project_options(parser);
 
-    cflags = makegen_get_option_with_default(parser, "--cflags", "-c", NULL);
-    ldflags = makegen_get_option_with_default(parser, "--ldflags", "-l", NULL);
-    ldlibs = makegen_get_option_with_default(parser, "--ldlibs", "-L", NULL);
-    binary_name = makegen_get_option_with_default(parser, "--binary", "-b", NULL);
+    cflags = makegen_get_option_with_default(parser, "--cflags", "-c", "");
+    ldflags = makegen_get_option_with_default(parser, "--ldflags", "-l", "");
+    ldlibs = makegen_get_option_with_default(parser, "--ldlibs", "-L", "");
+    binary_name = makegen_get_option_with_default(parser, "--binary", "-b", "");
 
     /* Dump variables that need to be 'collected' */
     dump_objs_variable(location, parser, files);
@@ -388,7 +388,6 @@ void unix_project_makefile(struct ArgparseParser parser, struct FilesystemPaths 
     /* Dump the install rule */
     fprintf(location, "%s", "install:\n");
     fprintf(location, "%s", "\tmkdir -p $(PREFIX)\n");
-    fprintf(location, "%s", "\tmkdir -p $(PREFIX)/bin\n");
     fprintf(location, "\tinstall -m 755 %s $(PREFIX)/bin\n\n", binary_name);
 
     /* Dump the uninstall rule */
@@ -413,10 +412,10 @@ void unix_library_makefile(struct ArgparseParser parser, struct FilesystemPaths 
 
     makegen_verify_library_options(parser);
 
-    cflags = makegen_get_option_with_default(parser, "--cflags", "-c", NULL);
-    ldflags = makegen_get_option_with_default(parser, "--ldflags", "-l", NULL);
-    ldlibs = makegen_get_option_with_default(parser, "--ldlibs", "-L", NULL);
-    library_name = makegen_get_option_with_default(parser, "--name", "-n", NULL);
+    cflags = makegen_get_option_with_default(parser, "--cflags", "-c", "");
+    ldflags = makegen_get_option_with_default(parser, "--ldflags", "-l", "");
+    ldlibs = makegen_get_option_with_default(parser, "--ldlibs", "-L", "");
+    library_name = makegen_get_option_with_default(parser, "--name", "-n", "");
 
     /* Dump variables that need to be 'collected' */
     dump_objs_variable(location, parser, files);

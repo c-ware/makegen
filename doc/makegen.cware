@@ -1,4 +1,4 @@
-.TH "makegen" "cware" "June 09, 2022" "" "C-Ware Manuals"
+.TH "makegen" "cware" "June 30, 2022" "" "C-Ware Manuals"
 .SH NAME
 makegen - generate makefiles for different dialects of make
 .SH SYNOPSIS

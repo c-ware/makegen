@@ -3,6 +3,9 @@ TESTOBJS=./src/header-extraction.o ./src/common.o ./src/resolve.o ./src/libmatch
 TESTS=
 CC=cc
 PREFIX=/usr/local
+LDFLAGS=
+LDLIBS=
+CFLAGS=
 
 all: $(OBJS) $(TESTS) makegen
 
@@ -94,4 +97,4 @@ uninstall:
 	$(CC) -c $(CFLAGS) ./src/argparse/argparse.c -o ./src/argparse/argparse.o $(LDFLAGS) $(LDLIBS)
 
 makegen: $(OBJS)
-	$(CC) $(OBJS) -o makegen
+	$(CC) $(OBJS) -o makegen $(LDFLAGS) $(LDLIBS)
